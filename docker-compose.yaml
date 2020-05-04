@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: "rabbitmq"
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq1"
+  order-db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+        SA_PASSWORD: "Superl33tpassw0rd!"
+        ACCEPT_EULA: "Y"
+        MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+  order-api:
+      build: Order_API/.
+      environment:
+        ASPNETCORE_URLS: "http://*:5050"
+      ports:
+          - "5051:5050"
+      depends_on:
+          - order-db
+  customer-db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+        SA_PASSWORD: "Superl33tpassw0rd!"
+        ACCEPT_EULA: "Y"
+        MSSQL_PID: Express
+    ports:
+      - "1434:1433"
+  customer-api:
+      build: Customer_API/.
+      environment:
+        ASPNETCORE_URLS: "http://*:5050"
+      ports:
+          - "5050:5050"
+      depends_on:
+          - customer-db
+    

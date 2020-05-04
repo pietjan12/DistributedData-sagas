@@ -1,1 +1,1 @@
-eigending
+Small demo project showcasing CQRS and saga's using two microservices with rebus and rabbitMQ transport.
