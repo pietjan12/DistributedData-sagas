@@ -21,6 +21,8 @@ services:
         SA_PASSWORD: "Superl33tpassw0rd!"
         ACCEPT_EULA: "Y"
         MSSQL_PID: Express
+    volumes:
+      - order-data:/var/opt/mssql
     ports:
       - "1433:1433"
   order-api:
@@ -37,6 +39,8 @@ services:
         SA_PASSWORD: "Superl33tpassw0rd!"
         ACCEPT_EULA: "Y"
         MSSQL_PID: Express
+    volumes:
+      - customer-data:/var/opt/mssql
     ports:
       - "1434:1433"
   customer-api:
@@ -47,4 +51,7 @@ services:
           - "5050:5050"
       depends_on:
           - customer-db
+volumes:
+  order-data:
+  customer-data:
     

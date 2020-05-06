@@ -6,7 +6,21 @@
 
   <ItemGroup>
     <PackageReference Include="Rebus.RabbitMq" Version="6.1.0" />
+    <PackageReference Include="Rebus.Serilog" Version="6.0.0" />
+    <PackageReference Include="Rebus.ServiceProvider" Version="5.0.6" />
+    <PackageReference Include="Rebus.SqlServer" Version="6.1.2" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="common">
+      <HintPath>..\..\common\common\bin\Release\netcoreapp3.1\common.dll</HintPath>
+    </Reference>
+    <Reference Include="Messages">
+      <HintPath>..\..\Messages\Messages\bin\Release\netcoreapp3.1\Messages.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 

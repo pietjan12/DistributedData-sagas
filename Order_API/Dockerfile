@@ -12,6 +12,7 @@ RUN dotnet restore --verbosity n
 
 # Copy everything else and build
 COPY Order_API/. .
+COPY References/. ./References
 RUN dotnet build -c Release -o out
 
 from build AS publish

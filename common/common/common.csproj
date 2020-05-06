@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Rebus.RabbitMq" Version="7.0.0" />
+    <PackageReference Include="Rebus.Serilog" Version="6.0.0" />
+    <PackageReference Include="Rebus.SqlServer" Version="6.1.2" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+</Project>
