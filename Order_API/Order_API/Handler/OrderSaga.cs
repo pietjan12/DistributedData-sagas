@@ -66,7 +66,7 @@ namespace Order_API.Handler
 
         public async Task Handle(VerifyComplete message)
         {
-            Logger.Warning("The saga for case {ID} was not completed within {TimeoutSeconds} s timeout", Data.requestID, 20);
+            Logger.Warning("The saga for order {ID} was not completed within {TimeoutSeconds} s timeout", Data.requestID, 20);
 
             await _bus.Publish(new OrderFailedEvent(Data.requestID));
 
