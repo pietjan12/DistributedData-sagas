@@ -7,11 +7,11 @@ namespace Messages.Events
 {
     public class OrderFailedEvent : IEventWithIdIdentifier
     {
-        public int ID { get; }
+        public int requestID { get; }
 
-        public OrderFailedEvent(int id)
+        public OrderFailedEvent(int requestID)
         {
-            ID = id;
+            this.requestID = requestID;
         }
     }
 }

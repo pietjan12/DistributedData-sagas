@@ -23,22 +23,22 @@ namespace Order_API.Handler
             _bus = bus;
         }
 
-        protected override void CorrelateMessages(ICorrelationConfig<OrderSagaData  > config)
+        protected override void CorrelateMessages(ICorrelationConfig<OrderSagaData> config)
         {
             // Events welke we willen volgen in deze saga.
-            config.Correlate<OrderCreatedEvent>(m => m.ID, d => d.ID);
-            config.Correlate<OrderStockAvailableEvent>(m => m.ID, d => d.ID);
-            config.Correlate<OrderPaymentReservedEvent>(m => m.ID, d => d.ID);
+            config.Correlate<OrderCreatedEvent>(m => m.requestID, d => d.requestID);
+            config.Correlate<OrderStockAvailableEvent>(m => m.requestID, d => d.requestID);
+            config.Correlate<OrderPaymentReservedEvent>(m => m.requestID, d => d.requestID);
 
             // interne verificatie achteraf.
-            config.Correlate<VerifyComplete>(m => m.ID, d => d.ID);
+            config.Correlate<VerifyComplete>(m => m.requestID, d => d.requestID);
         }
 
         public async Task Handle(OrderCreatedEvent message)
         {
             await Pre();
 
-            Logger.Information("Setting {FieldName} to true for order {ID}", "Order Created", Data.ID);
+            Logger.Information("Setting {FieldName} to true for order {ID}", "Order Created", Data.requestID);
 
             Data.OrderCreated = true;
 
@@ -49,7 +49,7 @@ namespace Order_API.Handler
         {
             await Pre();
 
-            Logger.Information("Setting {FieldName} to true for order {ID}", "Order Stock Available and reserved", Data.ID);
+            Logger.Information("Setting {FieldName} to true for order {ID}", "Order Stock Available and reserved", Data.requestID);
             Data.OrderStockAvailable = true;
 
             await Post();
@@ -59,16 +59,16 @@ namespace Order_API.Handler
         {
             await Pre();
 
-            Logger.Information("Setting {FieldName} to true for order {ID}", "Payment Reserved", Data.ID);
+            Logger.Information("Setting {FieldName} to true for order {ID}", "Payment Reserved", Data.requestID);
             Data.OrderPaymentReserved = true;
             await Post();
         }
 
         public async Task Handle(VerifyComplete message)
         {
-            Logger.Warning("The saga for case {ID} was not completed within {TimeoutSeconds} s timeout", Data.ID, 20);
+            Logger.Warning("The saga for case {ID} was not completed within {TimeoutSeconds} s timeout", Data.requestID, 20);
 
-            await _bus.Publish(new OrderFailedEvent(Data.ID));
+            await _bus.Publish(new OrderFailedEvent(Data.requestID));
 
             MarkAsComplete();
         }
@@ -77,18 +77,18 @@ namespace Order_API.Handler
         {
             if (!IsNew) return;
 
-            Logger.Information("Ordering wake-up call in {second} s  for order {ID}", 20, Data.ID);
+            Logger.Information("Ordering wake-up call in {second} s  for order {ID}", 20, Data.requestID);
 
-            await _bus.DeferLocal(TimeSpan.FromSeconds(20), new VerifyComplete(Data.ID));
+            await _bus.DeferLocal(TimeSpan.FromSeconds(20), new VerifyComplete(Data.requestID));
         }
 
         async Task Post()
         {
             if (!Data.IsDone) return;
 
-            Logger.Information("Publishing ready event and marking saga for order {ID} as complete", Data.ID);
+            Logger.Information("Publishing ready event and marking saga for order {ID} as complete", Data.requestID);
 
-            await _bus.Publish(new OrderReadyEvent(Data.ID));
+            await _bus.Publish(new OrderReadyEvent(Data.requestID));
 
             MarkAsComplete();
         }
@@ -96,7 +96,7 @@ namespace Order_API.Handler
 
     public class OrderSagaData : SagaData
     {
-        public int ID { get; set; }
+        public int requestID { get; set; }
 
         public bool OrderCreated { get; set; }
         public bool OrderStockAvailable { get; set; }

@@ -7,11 +7,11 @@ namespace Order_API.Messages
 {
     public class VerifyComplete
     {
-        public int ID { get; }
+        public int requestID { get; }
 
-        public VerifyComplete(int id)
+        public VerifyComplete(int requestID)
         {
-            ID = id;
+            this.requestID = requestID;
         }
     }
 }

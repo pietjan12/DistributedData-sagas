@@ -7,11 +7,11 @@ namespace Messages.Events
 {
     public class OrderPaymentReservedEvent : IEventWithIdIdentifier
     {
-        public int ID { get; }
+        public int requestID { get; }
 
-        public OrderPaymentReservedEvent(int id)
+        public OrderPaymentReservedEvent(int requestID)
         {
-            ID = id;
+            this.requestID = requestID;
         }
     }
 }

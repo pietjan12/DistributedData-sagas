@@ -6,6 +6,6 @@ namespace Messages.Events.Interfaces
 {
     public interface IEventWithIdIdentifier
     {
-        int ID { get; }
+        int requestID { get; }
     }
 }

@@ -37,8 +37,8 @@ namespace Order_API
             .Logging(l => l.Serilog(Log.Logger))
             .Transport(t => t.UseRabbitMq(Configuration.GetValue<string>("Connection:rabbitmq"), Configuration.GetValue<string>("rabbitmq:queuename")))
             //TIMEOUTS EN SAGAS CONNECTION STRING IS AAN HET KUTTEN. TODO FIXEN
-            .Sagas(sa => sa.StoreInSqlServer(Configuration.GetConnectionString("Database"), Configuration.GetValue<string>("SagaDataTableName"), Configuration.GetValue<string>("SagaIndexTableName")))
-            //.Timeouts(to => to.StoreInSqlServer(Configuration.GetConnectionString("Database"), Configuration.GetValue<string>("TimeoutsTableName")))
+            .Sagas(sa => sa.StoreInSqlServer(Configuration.GetConnectionString("Database"), Configuration.GetValue<string>("SagaDataTableName"), Configuration.GetValue<string>("SagaIndexTableName"), true))
+            .Timeouts(to => to.StoreInSqlServer(Configuration.GetConnectionString("Database"), Configuration.GetValue<string>("TimeoutsTableName"), true))
             .Routing(x => x.TypeBased()));
 
             services.AddRebusHandler<OrderSaga>();
