@@ -25,8 +25,8 @@ namespace Order_API.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> CreateOrder([FromBody] OrderIdRequest order)
         {
-            _logger.LogInformation("Creating order with id {ID}", order.orderID);
-            await _bus.Publish(new OrderCreatedEvent(order.orderID));
+            _logger.LogInformation("Creating order with id {ID} with timeout of 10s", order.orderID);
+            await _bus.Publish(new OrderCreatedEvent(order.orderID), optionalHeaders: new Dictionary<string, string> { { "optionalHeaders", "10000" } });
             return new ActionResult<string>($"Order created with ID: {order.orderID}");
         } 
     }

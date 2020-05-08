@@ -56,7 +56,9 @@ namespace Order_API
                 //tell rebus which events to watch out for
                 await bus.Subscribe<OrderCreatedEvent>();
                 await bus.Subscribe<OrderStockAvailableEvent>();
+                await bus.Subscribe<OrderStockNotAvailableEvent>();
                 await bus.Subscribe<OrderPaymentReservedEvent>();
+                await bus.Subscribe<OrderPaymentFailedEvent>();
                 await bus.Subscribe<OrderFailedEvent>();
             });
 

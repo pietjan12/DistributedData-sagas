@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Order_API.Handler
 {
-    public class OrderSaga : Saga<OrderSagaData>, IAmInitiatedBy<OrderCreatedEvent>, IAmInitiatedBy<OrderStockAvailableEvent>, IAmInitiatedBy<OrderPaymentReservedEvent>, IHandleMessages<VerifyComplete>
+    public class OrderSaga : Saga<OrderSagaData>, IAmInitiatedBy<OrderCreatedEvent>, IAmInitiatedBy<OrderStockAvailableEvent>, IAmInitiatedBy<OrderPaymentReservedEvent>, IAmInitiatedBy<OrderStockNotAvailableEvent>, IAmInitiatedBy<OrderPaymentFailedEvent> , IHandleMessages<VerifyComplete>
     {
         static readonly ILogger Logger = Log.ForContext<OrderSaga>();
 
@@ -29,6 +29,8 @@ namespace Order_API.Handler
             config.Correlate<OrderCreatedEvent>(m => m.requestID, d => d.requestID);
             config.Correlate<OrderStockAvailableEvent>(m => m.requestID, d => d.requestID);
             config.Correlate<OrderPaymentReservedEvent>(m => m.requestID, d => d.requestID);
+            config.Correlate<OrderStockNotAvailableEvent>(m => m.requestID, d => d.requestID);
+            config.Correlate<OrderPaymentFailedEvent>(m => m.requestID, d => d.requestID);
 
             // interne verificatie achteraf.
             config.Correlate<VerifyComplete>(m => m.requestID, d => d.requestID);
@@ -68,6 +70,8 @@ namespace Order_API.Handler
         {
             Logger.Warning("The saga for order {ID} was not completed within {TimeoutSeconds} s timeout", Data.requestID, 20);
 
+            //timeout occured, initiate rollback
+            await RollBack(true);
             await _bus.Publish(new OrderFailedEvent(Data.requestID));
 
             MarkAsComplete();
@@ -86,11 +90,51 @@ namespace Order_API.Handler
         {
             if (!Data.IsDone) return;
 
-            Logger.Information("Publishing ready event and marking saga for order {ID} as complete", Data.requestID);
+            if (Data.IsError)
+            {
+                //error occured, initiate rollback.
+                await RollBack();
+            }
+            else
+            {
+                //No error occured, publish order ready event.
+                Logger.Information("Publishing ready event and marking saga for order {ID} as complete", Data.requestID);
 
-            await _bus.Publish(new OrderReadyEvent(Data.requestID));
+                await _bus.Publish(new OrderReadyEvent(Data.requestID));
+            }
 
             MarkAsComplete();
+        }
+
+        async Task RollBack(bool cancelled = false)
+        {
+            if(cancelled)
+            {
+                
+            } else
+            {
+                //wasnt cancelled by timeout, check for errors
+                if(Data.IsError)
+                {
+                   
+                }
+            }
+        }
+
+        public async Task Handle(OrderStockNotAvailableEvent message)
+        {
+            await Pre();
+
+            Logger.Warning("Stock unavailable for order ID: {id}", message.requestID);
+
+            Data.OrderStockUnavailable = true;
+            
+            await Post();
+        }
+
+        public Task Handle(OrderPaymentFailedEvent message)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -102,8 +146,16 @@ namespace Order_API.Handler
         public bool OrderStockAvailable { get; set; }
         public bool OrderPaymentReserved { get; set; }
 
+        public bool OrderStockUnavailable { get; set; }
+        public bool OrderPaymentFailed { get; set; }
+
         public bool IsDone => OrderCreated
                               && OrderStockAvailable
-                              && OrderPaymentReserved;
+                              && OrderPaymentReserved
+                              || OrderCreated 
+                              && (OrderStockUnavailable || OrderPaymentFailed);
+
+        public bool IsError => OrderStockUnavailable || OrderPaymentFailed;
+
     }
 }
