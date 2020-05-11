@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Order_API.Persistence.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +16,14 @@ namespace Order_API.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Order>().HasKey(o => o.Id);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
         }
+
+        public DbSet<Order> Orders { get; set; }
     }
 }

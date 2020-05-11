@@ -6,6 +6,8 @@ using Messages.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Order_API.DTO;
+using Order_API.DTO.Requests;
+using Order_API.Services;
 using Rebus.Bus;
 
 namespace Order_API.Controllers
@@ -14,20 +16,18 @@ namespace Order_API.Controllers
     [Route("[controller]")]
     public class OrderController : ControllerBase
     {
-        private readonly ILogger<OrderController> _logger;
-        private IBus _bus;
-        public OrderController(IBus bus, ILogger<OrderController> logger)
+        private readonly IOrderService _orderService;
+
+        public OrderController(IOrderService orderService)
         {
-            _bus = bus;
-            _logger = logger;
+            _orderService = orderService;
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CreateOrder([FromBody] OrderIdRequest order)
+        public async Task<ActionResult<string>> CreateOrder([FromBody] OrderCreateRequest request)
         {
-            _logger.LogInformation("Creating order with id {ID} with timeout of 10s", order.orderID);
-            await _bus.Publish(new OrderCreatedEvent(order.orderID), optionalHeaders: new Dictionary<string, string> { { "optionalHeaders", "10000" } });
-            return new ActionResult<string>($"Order created with ID: {order.orderID}");
+            var order  = await _orderService.CreateOrder(request);
+            return new ActionResult<string>($"Order created with ID: {order.Data.Id}");
         } 
     }
 }
