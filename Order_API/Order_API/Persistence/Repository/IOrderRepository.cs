@@ -13,5 +13,7 @@ namespace Order_API.Repository
         Task<DataResponseObject<IEnumerable<Order>>> GetOrders();
 
         Task<DataResponseObject<Order>> CreateOrder(Order order);
+
+        Task<DataResponseObject<Order>> UpdateOrderStatus(int id, Status status);
     }
 }

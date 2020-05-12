@@ -1,7 +1,7 @@
 ﻿public enum Status
 {
     PENDING,
-    PAYMENT_RECEIVED,
+    PAYMENT_RESERVED,
     STOCK_RESERVED,
     FAILED,
     COMPLETE

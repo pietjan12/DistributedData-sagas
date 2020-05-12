@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Order_API.DTO;
 using Order_API.DTO.Requests;
+using Order_API.DTO.Response;
 using Order_API.Services;
 using Rebus.Bus;
 
@@ -24,10 +25,27 @@ namespace Order_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CreateOrder([FromBody] OrderCreateRequest request)
+        public async Task<ActionResult<OrderDTO>> CreateOrder([FromBody] OrderCreateRequest request)
         {
             var order  = await _orderService.CreateOrder(request);
-            return new ActionResult<string>($"Order created with ID: {order.Data.Id}");
-        } 
+            return CreatedAtAction(nameof(GetOrderById), new { id = order.Data.Id }, order.Data);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
+        {
+            var order = await _orderService.GetOrderById(id);
+            if(!order.Success) {
+                return NotFound(order.Message);
+            }
+            return Ok(order.Data);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
+        {
+            var orders = await _orderService.GetOrders();
+            return Ok(orders.Data);
+        }
     }
 }

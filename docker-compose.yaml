@@ -33,25 +33,25 @@ services:
           - "5051:5050"
       depends_on:
           - order-db
-  customer-db:
+  other-db:
     image: "mcr.microsoft.com/mssql/server"
     environment:
         SA_PASSWORD: "Superl33tpassw0rd!"
         ACCEPT_EULA: "Y"
         MSSQL_PID: Express
     volumes:
-      - customer-data:/var/opt/mssql
+      - other-data:/var/opt/mssql
     ports:
       - "1434:1433"
-  customer-api:
-      build: Customer_API/.
+  other-api:
+      build: Other_APIS/.
       environment:
         ASPNETCORE_URLS: "http://*:5050"
       ports:
           - "5050:5050"
       depends_on:
-          - customer-db
+          - other-db
 volumes:
   order-data:
-  customer-data:
+  other-data:
     

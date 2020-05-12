@@ -10,13 +10,12 @@ namespace Order_API.Persistence.Context
     public class OrderDbContext : DbContext
     {
         public OrderDbContext(DbContextOptions<OrderDbContext> options) : base(options)
-        {
-            this.Database.EnsureCreated();
-        }
+        {}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Order>().HasKey(o => o.Id);
+            base.OnModelCreating(modelBuilder);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Order_API.DTO;
 using Order_API.DTO.Requests;
 using Order_API.DTO.Response;
 using Order_API.Persistence.Entities;
@@ -15,6 +16,7 @@ namespace Order_API.Mappings
         {
             CreateMap<Order, OrderDTO>();
             CreateMap<OrderCreateRequest, Order>();
+            CreateMap(typeof(DataResponseObject<>), typeof(DataResponseObject<>));
         }
     }
 }

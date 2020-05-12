@@ -43,5 +43,17 @@ namespace Order_API.Persistence.Repository
             var orders = await _context.Orders.ToListAsync();
             return new DataResponseObject<IEnumerable<Order>>(orders);
         }
+
+        public async Task<DataResponseObject<Order>> UpdateOrderStatus(int id, Status status)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if(order == null)
+            {
+                return new DataResponseObject<Order>("Order could not be found");
+            }
+            order.Status = status;
+            await _context.SaveChangesAsync();
+            return new DataResponseObject<Order>(order);
+        }
     }
 }

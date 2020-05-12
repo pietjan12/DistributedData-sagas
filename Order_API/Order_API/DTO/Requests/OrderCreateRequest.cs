@@ -7,6 +7,6 @@ namespace Order_API.DTO.Requests
 {
     public class OrderCreateRequest
     {
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }
