@@ -35,7 +35,7 @@ namespace Order_API.Services
             if(createdOrder.Success)
             {
                 _logger.LogInformation("Creating order with id {ID} with timeout of 10s", createdOrder.Data.Id);
-                await _bus.Publish(new OrderCreatedEvent(createdOrder.Data.Id), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
+                await _bus.Publish(new OrderCreatedEvent(createdOrder.Data.Id, createdOrder.Data.Price, createdOrder.Data.StockAmount, createdOrder.Data.UserId), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
             }
             return _mapper.Map<DataResponseObject<OrderDTO>>(createdOrder);
         }

@@ -21,7 +21,6 @@ namespace Other_APIS.Handlers
 
         public async Task Handle(StockReserveEvent message)
         {
-
             Logger.Information($"StockReserveEvent received for id: {message.requestID} with stock: {message.AmountOfStock}");
             if(message.AmountOfStock >= 50)
             {

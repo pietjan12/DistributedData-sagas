@@ -8,5 +8,7 @@ namespace Order_API.DTO.Requests
     public class OrderCreateRequest
     {
         public Guid UserId { get; set; }
+        public double Price { get; set; }
+        public int StockAmount { get; set; }
     }
 }

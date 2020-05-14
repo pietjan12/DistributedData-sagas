@@ -20,12 +20,6 @@ namespace Order_API.Handler
         readonly IBus _bus;
         readonly IOrderService _orderService;
 
-        //mock values cause im too lazy to store them in db and do the migrate again. 
-        // (╯°□°)╯︵ ┻━┻
-        readonly double Price = 40;
-        readonly int StockAmount = 55;
-        readonly int UserId = 2;
-
         public OrderSaga (IBus bus, IOrderService orderService)
         {
             _bus = bus;
@@ -55,9 +49,14 @@ namespace Order_API.Handler
             Logger.Information("Setting {FieldName} to true for order {ID}", "Order Created", Data.requestID);
             Data.OrderCreated = true;
 
+            //set saga data for initiating future events, based on the order created event message
+            Data.Price = message.Price;
+            Data.StockAmount = message.StockAmount;
+            Data.UserId = message.UserId;
+
             //publish the event that the payment service subscribes to with the necessary data mocked
             Logger.Information($"Publishing PaymentReserveEvent event for order {message.requestID}");
-            await _bus.Publish(new PaymentReserveEvent(message.requestID, Price, UserId), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
+            await _bus.Publish(new PaymentReserveEvent(Data.requestID, Data.Price, Data.UserId), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
 
             await Post();
         }
@@ -87,7 +86,7 @@ namespace Order_API.Handler
 
             //publish the event to reserve the stock since payment went through
             Logger.Information($"Publishing StockReserveEvent event for order {message.requestID}");
-            await _bus.Publish(new StockReserveEvent(message.requestID, StockAmount), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
+            await _bus.Publish(new StockReserveEvent(message.requestID, Data.StockAmount), optionalHeaders: new Dictionary<string, string> { { "x-message-ttl", "10000" } });
 
             await Post();
         }
@@ -182,14 +181,16 @@ namespace Order_API.Handler
                 {
                     if(Data.OrderPaymentFailed)
                     {
+                        Logger.Information("Order payment failed which does not require any additional rollbacks up the chain, closing saga...");
                         //payment failed is first step in the saga and we dont need to do any rollback actions this way. so we mark the saga as complete
                         MarkAsComplete();
                     }
 
                     if (Data.OrderStockUnavailable)
                     {
-                        //publish event with no expiration time.
-                        await _bus.Publish(new PaymentRefundEvent(Data.requestID, Price, UserId));
+                        Logger.Information("Stock was not available, initialising payment refund procedure....");
+                        //publish event with no expiration time. to initiate refund, pull price from sagadata stored at creation of saga.
+                        await _bus.Publish(new PaymentRefundEvent(Data.requestID, Data.Price, Data.UserId));
                     }
                 }
             }
@@ -199,6 +200,9 @@ namespace Order_API.Handler
     public class OrderSagaData : SagaData
     {
         public int requestID { get; set; }
+        public double Price { get; set; }
+        public int StockAmount { get; set; }
+        public Guid UserId { get; set; }
 
         public bool OrderCreated { get; set; }
         public bool OrderStockAvailable { get; set; }

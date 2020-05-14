@@ -9,9 +9,9 @@ namespace Messages.Events
     {
         public int requestID { get; }
         public double RefundAmount { get; }
-        public int UserId { get; }
+        public Guid UserId { get; }
 
-        public PaymentRefundEvent(int requestID, double RefundAmount, int UserId)
+        public PaymentRefundEvent(int requestID, double RefundAmount, Guid UserId)
         {
             this.requestID = requestID;
             this.RefundAmount = RefundAmount;

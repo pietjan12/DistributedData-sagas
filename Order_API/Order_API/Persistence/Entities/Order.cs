@@ -13,6 +13,8 @@ namespace Order_API.Persistence.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public Guid UserId { get; set; }
+        public double Price { get; set; }
+        public int StockAmount { get; set; }
 
         public Status Status { get; set; }
     }
